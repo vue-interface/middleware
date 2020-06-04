@@ -1,0 +1,62 @@
+{
+  "name": "@vue-interface/variant",
+  "version": "0.8.0",
+  "description": "An extensible Middleware component for VueRouter that closely mimic's Laravel's route middelware.",
+  "author": "Justin Kimbrell",
+  "scripts": {
+    "demo": "vue-cli-service serve tests/demo/main.js",
+    "serve": "vue-cli-service build --target lib --name=Variant ./index.js --watch",
+    "build": "vue-cli-service build --target lib --name=Variant ./index.js",
+    "test:unit": "vue-cli-service test:unit",
+    "test:debug": "node --inspect-brk node_modules/.bin/vue-cli-service test:unit --no-cache --watch --runInBand",
+    "lint": "vue-cli-service lint",
+    "docs:build": "./node_modules/.bin/vuepress build docs",
+    "docs:dev": "./node_modules/.bin/vuepress dev docs",
+    "fix": "vue-cli-service lint --fix",
+    "pre-release": "npm run build; git add . -A; git commit -m 'pre-release commit'",
+    "release": "git add . -A; git commit; git push --tags origin; npm publish;",
+    "release-major": "npm run pre-release && npm version major -m \"%s\" && npm run release;",
+    "release-minor": "npm run pre-release && npm version minor -m \"%s\" && npm run release;",
+    "release-patch": "npm run pre-release && npm version patch -m \"%s\" && npm run release;",
+    "watch": "npm run serve"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "lodash.camelcase": "^4.3.0",
+    "vue": "^2.6.11",
+    "vue-router": "^3.3.2"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.3.0",
+    "@vue/cli-plugin-eslint": "~4.3.0",
+    "@vue/cli-plugin-unit-jest": "^4.4.1",
+    "@vue/cli-service": "~4.3.0",
+    "@vue/test-utils": "^1.0.3",
+    "@vuepress/plugin-register-components": "^1.5.0",
+    "babel-eslint": "^10.1.0",
+    "cssnano": "^4.1.10",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^6.2.2",
+    "markdown-it-meta": "0.0.1",
+    "postcss-cli": "^7.1.1",
+    "vue-template-compiler": "^2.6.11",
+    "vuepress": "^1.5.0",
+    "vuepress-plugin-template-constants": "^0.2.1"
+  },
+  "bugs": {
+    "url": "https://github.com/vue-interface/variant/issues"
+  },
+  "homepage": "https://github.com/vue-interface/variant/docs#readme",
+  "keywords": [
+    "Variant",
+    "Vue",
+    "Component",
+    "Tailwind",
+    "Bootstrap"
+  ],
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vue-interface/variant.git"
+  }
+}
