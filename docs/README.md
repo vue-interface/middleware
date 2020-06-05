@@ -16,9 +16,9 @@ Yarn
 
 ## Defining Routes
 
-Creating `MiddlewareRoute` instances can be instantiated or created with the
-`route` helper method. All the standard route params are supported.
-`MiddlewareRouter` merely wraps standard route  object and adds the validation.
+Creating `MiddlewareRoute` instances can created with the `route` helper method.
+All the standard VueRoute params are supported. `MiddlewareRouter` wraps
+standard route object.
 
 ``` js
 // router.js
@@ -91,14 +91,14 @@ route({
     })
 ```
 
-## Route Middelware
+## Middelware Aliases
 
-Route middelware can be assigned to a single route or groups.
+Middelware aliases can be assigned to a single route or groups.
 
 ``` js
-import { regis } from '@vue-interface/middleware';
+import { alias } from '@vue-interface/middleware';
 
-route('global', (to, from, next) => {
+alias('some-name', (to, from, next) => {
     // do something
     return true;
 });
@@ -106,8 +106,37 @@ route('global', (to, from, next) => {
 route({
     name: 'home',
     path: 'home',
-    middleware: ['global', (to, from, next) => {
+    middleware: ['some-name', (to, from, next) => {
+        // do something else
+        return true;
+    }]
+})
+```
+
+## Middelware Groups
+
+Middelware groups can be used to assign a group of middlewares to a single
+name.
+
+``` js
+import { alias } from '@vue-interface/middleware';
+
+group('some-name', [
+    (to, from, next) => {
         // do something
+        return true;
+    },
+    (to, from, next) => {
+        // do something else
+        return true;
+    },
+]);
+
+route({
+    name: 'home',
+    path: 'home',
+    middleware: ['some-name', (to, from, next) => {
+        // do something else
         return true;
     }]
 })
@@ -167,7 +196,6 @@ route({
     alias: '',
     name: 'home',
     component: Home,
-    middleware: ['global'],
     onValid(to, from, next) {
         // do something
     }
@@ -189,7 +217,6 @@ route({
     alias: '',
     name: 'home',
     component: Home,
-    middleware: ['global'],
     onError(e) {
         console.log(e);
     }
@@ -207,8 +234,7 @@ route({
     path: '/',
     alias: '',
     name: 'home',
-    component: Home,
-    middleware: ['global']
+    component: Home
 })
     .onValid((to, from, next) => {
         // do something
