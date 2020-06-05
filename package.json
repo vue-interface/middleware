@@ -1,12 +1,12 @@
 {
-  "name": "@vue-interface/variant",
+  "name": "@vue-interface/middleware",
   "version": "0.8.0",
   "description": "An extensible Middleware component for VueRouter that closely mimic's Laravel's route middelware.",
   "author": "Justin Kimbrell",
   "scripts": {
     "demo": "vue-cli-service serve tests/demo/main.js",
-    "serve": "vue-cli-service build --target lib --name=Variant ./index.js --watch",
-    "build": "vue-cli-service build --target lib --name=Variant ./index.js",
+    "serve": "vue-cli-service build --target lib --name=Middleware ./index.js --watch",
+    "build": "vue-cli-service build --target lib --name=Middleware ./index.js",
     "test:unit": "vue-cli-service test:unit",
     "test:debug": "node --inspect-brk node_modules/.bin/vue-cli-service test:unit --no-cache --watch --runInBand",
     "lint": "vue-cli-service lint",
@@ -44,12 +44,13 @@
     "vuepress-plugin-template-constants": "^0.2.1"
   },
   "bugs": {
-    "url": "https://github.com/vue-interface/variant/issues"
+    "url": "https://github.com/vue-interface/middleware/issues"
   },
-  "homepage": "https://github.com/vue-interface/variant/docs#readme",
+  "homepage": "https://github.com/vue-interface/middleware/docs#readme",
   "keywords": [
-    "Variant",
+    "Middleware",
     "Vue",
+    "Laravel",
     "Component",
     "Tailwind",
     "Bootstrap"
@@ -57,6 +58,6 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vue-interface/variant.git"
+    "url": "git+https://github.com/vue-interface/middleware.git"
   }
 }
