@@ -47,20 +47,49 @@ export default class Middleware {
         return match && match.validator;
     }
 
+
     validate(to, from, next) {
-        return new Promise((resolve, reject) => {
+        const promise = new Promise((resolve, reject) => {
+            const resolver = response => {
+                if(response === true) {
+                    return resolve(response);
+                }
+    
+                return rejecter(response);
+            };
+    
+            const rejecter = response => {
+                return reject(new MiddlewareError(this, {to, from, next}, response));
+            };
+    
             const response = this.validator(to, from, next);
 
             if(response instanceof Promise) {
-                return response.then(resolve, reject);
+                return response.then(resolver, rejecter);
             }
 
-            if(response === true) {
-                resolve(response);
-            }
-
-            return reject(new MiddlewareError(this, {to, from, next}, response));
+            resolver(response);
         });
+
+        promise.then(() => {
+            this.onValid(to, from, next); 
+        }, e => {
+            this.onError(e);
+        });
+        
+        return promise;
+    }
+
+    onValid(to, from, next) {
+        //
+    }
+
+    onInvalid(to, from, next) {
+        //
+    }
+
+    onError(e) {
+        //
     }
 
     static make(subject, ...args) {

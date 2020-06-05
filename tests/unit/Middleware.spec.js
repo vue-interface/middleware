@@ -89,9 +89,23 @@ describe('Middleware.js', () => {
             registrar: undefined
         });
 
-        console.log(instance.registrar);
-
         expect(instance.middlewares).toHaveLength(0);
         expect(instance.middlewaresWithGlobal).toHaveLength(0);
+    });
+
+    it('handles the callbacks', async(done) => {
+        class TestMiddleware extends Middleware {
+            constructor() {
+                super(async() => {
+                    return false;
+                });
+            }
+        }
+
+        const instance = route('/').middleware(new TestMiddleware);
+        
+        instance.beforeEnter({}, {}, () => {});
+
+        done();
     });
 });

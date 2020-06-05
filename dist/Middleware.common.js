@@ -6151,23 +6151,49 @@ var Middleware_Middleware = /*#__PURE__*/function () {
     value: function validate(to, from, next) {
       var _this = this;
 
-      return new Promise(function (resolve, reject) {
+      var promise = new Promise(function (resolve, reject) {
+        var resolver = function resolver(response) {
+          if (response === true) {
+            return resolve(response);
+          }
+
+          return rejecter(response);
+        };
+
+        var rejecter = function rejecter(response) {
+          return reject(new MiddlewareError_MiddlewareError(_this, {
+            to: to,
+            from: from,
+            next: next
+          }, response));
+        };
+
         var response = _this.validator(to, from, next);
 
         if (response instanceof Promise) {
-          return response.then(resolve, reject);
+          return response.then(resolver, rejecter);
         }
 
-        if (response === true) {
-          resolve(response);
-        }
-
-        return reject(new MiddlewareError_MiddlewareError(_this, {
-          to: to,
-          from: from,
-          next: next
-        }, response));
+        resolver(response);
       });
+      promise.then(function () {
+        _this.onValid(to, from, next);
+      }, function (e) {
+        _this.onError(e);
+      });
+      return promise;
+    }
+  }, {
+    key: "onValid",
+    value: function onValid(to, from, next) {//
+    }
+  }, {
+    key: "onInvalid",
+    value: function onInvalid(to, from, next) {//
+    }
+  }, {
+    key: "onError",
+    value: function onError(e) {//
     }
   }, {
     key: "validator",

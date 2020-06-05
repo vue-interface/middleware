@@ -95,7 +95,7 @@ export default class Iterator {
             const promises = this.items.map(item => {
                 return item.validate(to, from, next);
             });
-    
+
             Promise.all(promises).then(resolve, reject);
         });
     }
