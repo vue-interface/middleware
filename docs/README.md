@@ -1,6 +1,6 @@
 # Middleware
 
-An extendible middleware plugin for VueRouter.
+An extensible Middleware component for VueRouter that closely mimic's Laravel's route middleware.
 
 [[toc]]
 
