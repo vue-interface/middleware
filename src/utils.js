@@ -1,5 +1,5 @@
 
-import camelCase from 'lodash.camelcase';
+import { camelCase } from '@vue-interface/utils';
 
 const MATCH_PATTERN = /^on_?([A-Z]?[a-z]+)?/;
 

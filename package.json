@@ -4,12 +4,11 @@
   "description": "An extensible Middleware component for VueRouter that closely mimic's Laravel's route middelware.",
   "author": "Justin Kimbrell",
   "scripts": {
-    "demo": "vue-cli-service serve tests/demo/main.js",
     "serve": "vue-cli-service build --target lib --name=Middleware ./index.js --watch",
     "build": "vue-cli-service build --target lib --name=Middleware ./index.js",
     "test:unit": "vue-cli-service test:unit",
-    "test:debug": "node --inspect-brk node_modules/.bin/vue-cli-service test:unit --no-cache --watch --runInBand",
     "lint": "vue-cli-service lint",
+    "demo": "vue-cli-service serve tests/demo/main.js",
     "docs:build": "./node_modules/.bin/vuepress build docs",
     "docs:dev": "./node_modules/.bin/vuepress dev docs",
     "fix": "vue-cli-service lint --fix",
@@ -18,19 +17,24 @@
     "release-major": "npm run pre-release && npm version major -m \"%s\" && npm run release;",
     "release-minor": "npm run pre-release && npm version minor -m \"%s\" && npm run release;",
     "release-patch": "npm run pre-release && npm version patch -m \"%s\" && npm run release;",
+    "test:debug": "node --inspect-brk node_modules/.bin/vue-cli-service test:unit --no-cache --watch --runInBand",
     "watch": "npm run serve"
   },
   "main": "index.js",
   "dependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.10.1",
+    "@babel/preset-react": "^7.10.1",
+    "@babel/preset-typescript": "^7.10.1",
+    "@vue-interface/utils": "^0.9.10",
     "lodash.camelcase": "^4.3.0",
     "vue": "^2.6.11",
     "vue-router": "^3.3.2"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.3.0",
-    "@vue/cli-plugin-eslint": "~4.3.0",
-    "@vue/cli-plugin-unit-jest": "^4.4.1",
-    "@vue/cli-service": "~4.3.0",
+    "@vue/cli-plugin-babel": "^4.4.6",
+    "@vue/cli-plugin-eslint": "^4.4.6",
+    "@vue/cli-plugin-unit-jest": "^4.4.6",
+    "@vue/cli-service": "^4.4.6",
     "@vue/test-utils": "^1.0.3",
     "@vuepress/plugin-register-components": "^1.5.0",
     "babel-eslint": "^10.1.0",
@@ -41,7 +45,8 @@
     "postcss-cli": "^7.1.1",
     "vue-template-compiler": "^2.6.11",
     "vuepress": "^1.5.0",
-    "vuepress-plugin-template-constants": "^0.2.1"
+    "vuepress-plugin-template-constants": "^0.2.1",
+    "webpack-manifest-plugin": "^2.2.0"
   },
   "bugs": {
     "url": "https://github.com/vue-interface/middleware/issues"
