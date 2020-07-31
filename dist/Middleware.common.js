@@ -6943,5 +6943,5 @@ module.exports = global.Promise;
 
 /***/ })
 
-/******/ })["default"];
+/******/ });
 //# sourceMappingURL=Middleware.common.js.map

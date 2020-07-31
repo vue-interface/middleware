@@ -6952,6 +6952,6 @@ module.exports = global.Promise;
 
 /***/ })
 
-/******/ })["default"];
+/******/ });
 });
 //# sourceMappingURL=Middleware.umd.js.map
