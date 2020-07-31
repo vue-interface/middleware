@@ -1,6 +1,6 @@
 {
   "name": "@vue-interface/middleware",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "An extensible Middleware component for VueRouter that closely mimic's Laravel's route middelware.",
   "author": "Justin Kimbrell",
   "scripts": {
