@@ -6786,13 +6786,7 @@ function registry_priority() {
 
 
 
-function route_route(component, route, options) {
-  if (!options) {
-    options = route;
-    route = component;
-    component = null;
-  }
-
+function route_route(route, options) {
   return new MiddlewareRoute_Route(route, Object.assign({
     registrar: registrar
   }, options));
