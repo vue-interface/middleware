@@ -5156,7 +5156,6 @@ __webpack_require__.d(__webpack_exports__, "group", function() { return /* reexp
 __webpack_require__.d(__webpack_exports__, "middleware", function() { return /* reexport */ registry_middleware; });
 __webpack_require__.d(__webpack_exports__, "priority", function() { return /* reexport */ registry_priority; });
 __webpack_require__.d(__webpack_exports__, "route", function() { return /* reexport */ route_route; });
-__webpack_require__.d(__webpack_exports__, "component", function() { return /* reexport */ component_component; });
 __webpack_require__.d(__webpack_exports__, "Middleware", function() { return /* reexport */ Middleware_Middleware; });
 __webpack_require__.d(__webpack_exports__, "MiddlewareError", function() { return /* reexport */ MiddlewareError_MiddlewareError; });
 __webpack_require__.d(__webpack_exports__, "MiddlewareIterator", function() { return /* reexport */ MiddlewareIterator_MiddlewareIterator; });
@@ -6787,24 +6786,18 @@ function registry_priority() {
 
 
 
-function route_route(route, options) {
+function route_route(component, route, options) {
+  if (!options) {
+    options = route;
+    route = component;
+    component = null;
+  }
+
   return new MiddlewareRoute_Route(route, Object.assign({
     registrar: registrar
   }, options));
 }
-// CONCATENATED MODULE: ./src/component.js
-
-
-
-function component_component(component, route, options) {
-  return new MiddlewareRoute_Route(Object.assign({
-    component: component
-  }, route), Object.assign({
-    registrar: registrar
-  }, options));
-}
 // CONCATENATED MODULE: ./index.js
-
 
 
 
