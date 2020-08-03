@@ -50,7 +50,7 @@
   "bugs": {
     "url": "https://github.com/vue-interface/middleware/issues"
   },
-  "homepage": "https://github.com/vue-interface/middleware/docs#readme",
+  "homepage": "https://github.com/vue-interface/middleware/blob/master/docs/README.md",
   "keywords": [
     "Middleware",
     "Vue",
