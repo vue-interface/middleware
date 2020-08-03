@@ -5165,6 +5165,7 @@ __webpack_require__.d(__webpack_exports__, "group", function() { return /* reexp
 __webpack_require__.d(__webpack_exports__, "middleware", function() { return /* reexport */ registry_middleware; });
 __webpack_require__.d(__webpack_exports__, "priority", function() { return /* reexport */ registry_priority; });
 __webpack_require__.d(__webpack_exports__, "route", function() { return /* reexport */ route_route; });
+__webpack_require__.d(__webpack_exports__, "component", function() { return /* reexport */ component_component; });
 __webpack_require__.d(__webpack_exports__, "Middleware", function() { return /* reexport */ Middleware_Middleware; });
 __webpack_require__.d(__webpack_exports__, "MiddlewareError", function() { return /* reexport */ MiddlewareError_MiddlewareError; });
 __webpack_require__.d(__webpack_exports__, "MiddlewareIterator", function() { return /* reexport */ MiddlewareIterator_MiddlewareIterator; });
@@ -6342,24 +6343,6 @@ var MiddlewareRoute_Route = /*#__PURE__*/function (_EventEmitter) {
   }
 
   _createClass(Route, [{
-    key: "initializeRoute",
-    value: function initializeRoute(route) {
-      for (var _i = 0, _Object$entries = Object.entries(route); _i < _Object$entries.length; _i++) {
-        var _Object$entries$_i = _slicedToArray(_Object$entries[_i], 2),
-            key = _Object$entries$_i[0],
-            value = _Object$entries$_i[1];
-
-        if (typeof this[key] === 'function') {
-          this[key].apply(this, _toConsumableArray(Array.isArray(value) ? value : [value]));
-        } else {
-          Object.defineProperty(this, key, {
-            value: value,
-            writable: true
-          });
-        }
-      }
-    }
-  }, {
     key: "intializeBeforeEnter",
     value: function intializeBeforeEnter(route) {
       var _this2 = this;
@@ -6377,6 +6360,24 @@ var MiddlewareRoute_Route = /*#__PURE__*/function (_EventEmitter) {
           _this2.emit('error', e, next);
         });
       };
+    }
+  }, {
+    key: "initializeRoute",
+    value: function initializeRoute(route) {
+      for (var _i = 0, _Object$entries = Object.entries(route); _i < _Object$entries.length; _i++) {
+        var _Object$entries$_i = _slicedToArray(_Object$entries[_i], 2),
+            key = _Object$entries$_i[0],
+            value = _Object$entries$_i[1];
+
+        if (typeof this[key] === 'function') {
+          this[key].apply(this, _toConsumableArray(Array.isArray(value) ? value : [value]));
+        } else {
+          Object.defineProperty(this, key, {
+            value: value,
+            writable: true
+          });
+        }
+      }
     }
   }, {
     key: "emit",
@@ -6800,7 +6801,19 @@ function route_route(route, options) {
     registrar: registrar
   }, options));
 }
+// CONCATENATED MODULE: ./src/component.js
+
+
+
+function component_component(component, route, options) {
+  return new MiddlewareRoute_Route(Object.assign({
+    component: component
+  }, route), Object.assign({
+    registrar: registrar
+  }, options));
+}
 // CONCATENATED MODULE: ./index.js
+
 
 
 

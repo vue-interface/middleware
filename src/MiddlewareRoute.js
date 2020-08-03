@@ -22,20 +22,6 @@ export default class Route extends EventEmitter {
         this.initializeRoute(route);
     }
 
-    initializeRoute(route) {
-        for(const [key, value] of Object.entries(route)) {
-            if(typeof this[key] === 'function') {
-                this[key](...(Array.isArray(value) ? value : [value]));
-            }
-            else {
-                Object.defineProperty(this, key, {
-                    value,
-                    writable: true
-                });
-            }
-        }
-    }
-
     intializeBeforeEnter(route) {
         this.beforeEnter = (to, from, next) => {
             this.middlewaresWithGlobal.validate(to, from, next)
@@ -51,6 +37,20 @@ export default class Route extends EventEmitter {
                     this.emit('error', e, next);
                 });
         };   
+    }
+
+    initializeRoute(route) {
+        for(const [key, value] of Object.entries(route)) {
+            if(typeof this[key] === 'function') {
+                this[key](...(Array.isArray(value) ? value : [value]));
+            }
+            else {
+                Object.defineProperty(this, key, {
+                    value,
+                    writable: true
+                });
+            }
+        }
     }
 
     set middlewares(value) {
