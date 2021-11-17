@@ -90,17 +90,14 @@ export default class Iterator {
         return this;
     }
 
-    validate(to, from, next) {
-        return new Promise((resolve, reject) => {
-            const promises = this.items.map(item => {
-                return item.validate(to, from, next);
-            });
+    async validate(to, from, next) {
+        for(const item of this.items) {
+            await item.validate(to, from, next);
+        }
 
-            Promise.all(promises).then(resolve, reject);
-        });
+        return true;
     }
     
-
     get length() {
         return this.items && this.items.length;
     }

@@ -23,7 +23,7 @@ export default class Route extends EventEmitter {
     }
 
     intializeBeforeEnter(route) {
-        this.beforeEnter = (to, from, next) => {
+        this.beforeEnter = async(to, from, next) => {
             this.middlewaresWithGlobal.validate(to, from, next)
                 .then(() => {
                     if(typeof route.beforeEnter === 'function') {
