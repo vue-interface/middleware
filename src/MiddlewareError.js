@@ -4,14 +4,20 @@ const DEFAULT_MESSAGE = 'Middleware failed to validate.';
 
 export default class MiddlewareError extends Error {
 
-    constructor(middleware, route = {}, response, msg, ...args) {
+    constructor(middleware, route = {}, response, msg) {
         if(!(middleware instanceof Middleware)) {
-            throw new Error('The first argument must be an instance of Middleware.');
+            throw new Error(
+                'The first argument must be an instance of Middleware.'
+            );
+        }
+
+        if(response instanceof Error) {
+            msg = response.message;
         }
 
         const { to, from, next } = route;
 
-        super(msg || DEFAULT_MESSAGE, ...args);
+        super(msg || DEFAULT_MESSAGE);
 
         this.to = to;
         this.from = from;
