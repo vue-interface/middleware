@@ -71,7 +71,7 @@ export default class Middleware {
             resolver(response);
         });
 
-        promise.then(() => {
+        promise.then(response => {
             this.onValid(to, from, next); 
         }, e => {
             this.onError(e);
@@ -81,10 +81,6 @@ export default class Middleware {
     }
 
     onValid(to, from, next) {
-        //
-    }
-
-    onInvalid(to, from, next) {
         //
     }
 
