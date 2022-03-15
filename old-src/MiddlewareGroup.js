@@ -3,7 +3,7 @@ import MiddlewareIterator from "./MiddlewareIterator";
 export default class MiddlewareGroup {
 
     constructor(middlewares, options) {
-        this.options = Object.assign({}, options || {});
+        this.options = Object.assign({}, options);
         this.registrar = this.options.registrar;
         this.middlewares = middlewares;
     }

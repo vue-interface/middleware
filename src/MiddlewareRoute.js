@@ -1,89 +1,67 @@
-import MiddlewareIterator from './MiddlewareIterator';
-import EventEmitter from './EventEmitter';
+import EventEmitter from "./EventEmitter";
+import Middleware from "./Middleware";
+import MiddlewareRegistry from "./MiddlewareRegistry";
+import { validate } from "./utils";
 
-export default class Route extends EventEmitter {
+export default class MiddlewareRoute extends EventEmitter {
 
     constructor(route, options) {
         super();
         
-        this.options = Object.assign({}, options || {});
-        this.registrar = this.options.registrar;
-        this.middlewares = [];
+        this.options = Object.assign({
+            catch: [],
+            middleware: [],
+            registrar: new MiddlewareRegistry,
+            then: []
+        }, options);     
 
-        if(typeof route === 'string') {
-            route = {path: route};
+        if(!(this.registrar instanceof MiddlewareRegistry)) {
+            throw Error('The `registrar` property must be an instance of MiddlewareRegistry');
         }
 
-        if(typeof route !== 'object') {
-            throw Error('Must be instantiated with a string or object.');
-        }
-
-        this.intializeBeforeEnter(route);
+        this.intializeBeforeEnter();
         this.initializeRoute(route);
     }
 
-    intializeBeforeEnter(route) {
+    intializeBeforeEnter() {
         this.beforeEnter = async(to, from, next) => {
-            this.middlewaresWithGlobal.validate(to, from, next)
-                .then(() => {
-                    if(typeof route.beforeEnter === 'function') {
-                        return route.beforeEnter(to, from, next);
-                    }
-
-                    this.emit('valid', to, from, next);
+            const promise = validate(
+                this.middlewares, to, from, next
+            ).then(response => {
+                next();
                 
-                    next();
-                }, e => {
-                    this.emit('error', e, next);
-                });
+                if(response && this.options.then.length) {
+                    this.options.then.reduce((promise, fn) => {
+                        return promise.then(() => fn(to, from, next));
+                    }, promise);
+                }
+            });
+
+            if(this.options.catch.length) {
+                this.options.catch.reduce((promise, fn) => {
+                    return promise.catch(e => fn(e, to, from, next));
+                }, promise);
+            }
         };   
     }
 
     initializeRoute(route) {
-        for(const [key, value] of Object.entries(route)) {
-            if(typeof this[key] === 'function') {
-                this[key](...(Array.isArray(value) ? value : [value]));
-            }
-            else {
-                Object.defineProperty(this, key, {
-                    value,
-                    writable: true
-                });
-            }
+        if(typeof route === 'string') {
+            route = {path: route};
         }
-    }
 
-    set middlewares(value) {
-        if(!(value instanceof MiddlewareIterator)) {
-            value = new MiddlewareIterator(value, {
-                registrar: this.registrar
+        for(const [key, value] of Object.entries(route)) {
+            Object.defineProperty(this, key, {
+                value,
+                writable: true
             });
         }
-
-        this.$middlewares = value;
     }
 
-    get middlewares() {
-        return this.$middlewares;        
-    }
-    
-    get middlewaresWithGlobal() {
-        const middlewares = [
-            ...this.$middlewares,
-            ...this.registrar ? this.registrar.registry.middleware : []
-        ];
+    catch(fn) {
+        this.options.catch.push(fn);
 
-        const iterator = new MiddlewareIterator(middlewares, {
-            registrar: this.registrar
-        });
-        
-        const prioritized = iterator.prioritize(
-            Array.from(this.registrar ? this.registrar.registry.priority : [])
-        );
-
-        return new MiddlewareIterator(prioritized, {
-            registrar: this.registrar
-        });
+        return this;
     }
 
     emit(...args) {
@@ -94,31 +72,24 @@ export default class Route extends EventEmitter {
         return super.emit(...args);
     }
 
-    middleware(...values) {
-        values.forEach(value => {
-            if(!Array.isArray(value)) {
-                value = [value];
-            }
-        
-            value.forEach(value => this.middlewares.push(value));
-        });
-        
+    middleware(value, callback) {
+        this.options.middleware.push(value);
+
         return this;
     }
-    
-    onValid(fn) {
-        return this.on('valid', fn);
-    }
-    
-    onError(fn) {
-        return this.on('error', fn);
+
+    then(fn) {
+        this.options.then.push(fn);
+
+        return this;
     }
 
-    static make(subject, ...args) {
-        if(subject instanceof this) {
-            return subject;
-        }
-
-        return new this(subject, ...args);
+    get middlewares() {
+        return this.registrar.prioritized(this.options.middleware);
     }
+
+    get registrar() {
+        return this.options.registrar || new MiddlewareRegistry();
+    }
+    
 }

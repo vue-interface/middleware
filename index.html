@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Middleware</title>
+    </head>
+    <body>
+        <div id="app" class="container mx-auto mb-6">
+            <router-view/>
+        </div>
+        
+        <script type="module">
+            import './index.css';
+            import Vue from 'vue/dist/vue';
+            import VueRouter from 'vue-router';
+
+            import { route, alias, group, middleware, priority } from './index.js';
+            
+            Vue.config.devtools = false;
+            Vue.config.productionTip = false;
+
+            Vue.use(VueRouter);
+
+            alias('is', (to, from, next, name) => {
+                if(to.name !== name) {
+                    next();
+                }
+            });
+
+            alias('id', (to, from, next, id, name) => {
+                if(parseInt(to.query.id) === parseInt(id)) {
+                    return;
+                }
+                
+                if(to.query.id === 3) {
+                    throw Error(`Redirecting to "${name}"!`);
+                }
+
+                next({name});
+            });
+
+            group('restricted', [
+                'is:restricted',
+                'id:1,unrestricted'
+            ]);
+
+            const router = new VueRouter({
+                routes: [
+                    route({
+                        path: '/',
+                        name: 'home',
+                        component: () => import('./demo/Home.vue')
+                    }).then(() => {
+                        console.log('home!')
+                    }),
+                    
+                    route({
+                        path: '/restricted', 
+                        name: 'restricted', 
+                        component: () => import('./demo/Restricted.vue')
+                    }).middleware('restricted').then((to, from, next) => {
+                        console.log('Route resolved!', to, from, next)
+                    }).catch((e, to, from, next) => {
+                        console.log('catch the error', e);
+
+                        next({name: 'unrestricted'});
+                    }),
+
+                    route({
+                        path: '/unrestricted',
+                        name: 'unrestricted',
+                        component: () => import('./demo/Unrestricted.vue')
+                    }).middleware('is:unrestricted')
+                ]
+            });
+            
+            const vue = new Vue({
+                el: '#app',
+                router
+            });
+        </script>
+    </body>
+</html>

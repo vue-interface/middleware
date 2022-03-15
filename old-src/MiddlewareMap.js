@@ -1,5 +1,3 @@
-import Middleware from "./Middleware";
-
 export default class MiddlewareMap extends Map {
 
     constructor(iterable, options) {

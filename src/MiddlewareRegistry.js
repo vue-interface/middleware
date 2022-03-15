@@ -1,56 +1,90 @@
-import MiddlewareIterator from './MiddlewareIterator';
-import MiddlewareMap from './MiddlewareMap';
-import MiddlewareIteratorMap from './MiddlewareIteratorMap';
-import Middleware from './Middleware';
-import Iterator from './Iterator';
-import MiddlewareGroup from './MiddlewareGroup';
-import EventEmitter from './EventEmitter';
+import { flatten } from "array-flatten";
+import EventEmitter from "./EventEmitter";
+import Middleware from "./Middleware";
 
 export default class MiddlewareRegistry extends EventEmitter {
 
-    constructor(options = {}) {
+    constructor() {
         super();
         
-        this.registry = {};
-        this.reset(options);
-    }
-    
-    reset(options = {}) {
-        this.priority(options.priority || options.priorities);
-
-        this.defineRegistry('middleware', options.middleware || options.middlewares, MiddlewareIterator, {
-            prioritize: this.prioritize
-        });
-                
-        this.defineRegistry('group', options.group || options.groups, MiddlewareIteratorMap, {
-            cast: value => MiddlewareGroup.make(value)
-        });
-
-        this.defineRegistry('alias', options.alias || options.aliases, MiddlewareMap, {
-            cast: value => Middleware.make(value)
-        });
+        this.aliases = new Map;
+        this.middlewares = [];
+        this.groups = new Map;
+        this.priorities = [];
     }
 
-    defineRegistry(key, value, cast, ...args) {
-        this.registry[key] = new cast(value, ...args);
+    alias(key, value) {
+        this.aliases.set(key, value);
 
         return this;
     }
 
-    middleware(...args) {
-        return this.registry.middleware.push(...args);
+    group(key, value) {
+        this.groups.set(key, value);
+
+        return this;
     }
 
-    alias(...args) {
-        return this.registry.alias.set(...args);
+    middleware(value) {
+        this.middlewares.push(value);
+
+        return this;
     }
 
-    group(...args) {
-        return this.registry.group.set(...args);
-    }
+    priority(...args) {
+        this.priorities = [].concat(...args);
 
-    priority(value) {
-        return this.defineRegistry('priority', value, Iterator);
+        return this;
     }
     
+    prioritize(...args) {
+        return [].concat(...args).sort((a, b) => {
+            let aIndex = this.priorities.indexOf(a.key || a.validator),
+                bIndex = this.priorities.indexOf(b.key || b.validator);
+
+            if(aIndex > -1 && bIndex > -1) {
+                return aIndex < bIndex ? -1 : 1;
+            }
+    
+            return aIndex > -1 ? -1 : 1;
+        }); 
+    }
+
+    resolve(...args) {
+        return flatten([].concat(...args).map(value => {
+            if(Array.isArray(value)) {
+                return this.resolve(value);
+            }
+
+            if(typeof value === 'function') {
+                return Middleware.make(value);
+            }
+        
+            const [ key, args ] = this.definition(value);
+        
+            if(this.aliases.has(key)) {
+                return Middleware.make(this.aliases.get(key), key, ...args);
+            }
+        
+            if(this.groups.has(key)) {
+                return this.resolve(this.groups.get(key));
+            }
+        }));
+    }
+
+    definition(value) {
+        const [ key, args ] = String(value).split(':');
+
+        return [
+            key, args ? args.split('.') : []
+        ].filter(value => !!value);
+    }
+
+    prioritized(...args) {
+        return this.prioritize(this.resolve([
+            ...this.middlewares,
+            ...args,
+        ]).filter(value => value instanceof Middleware));
+    }
+
 }
