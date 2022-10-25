@@ -12,7 +12,7 @@
   },
   "main": "./dist/middleware.umd.js",
   "module": "./dist/middleware.es.js",
-  "types": "./src/index.d.ts",
+  "types": "./dist/index.d.ts",
   "browserslist": "last 2 versions, > 0.5%, ie >= 11",
   "scripts": {
     "dev": "vite",
