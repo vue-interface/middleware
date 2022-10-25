@@ -3,7 +3,8 @@ module.exports = {
         'plugin:vue/recommended'
     ],
     parserOptions: {
-        'parser': 'babel-eslint'
+        'parser': '@babel/eslint-parser',
+        "ecmaVersion": 6
     },
     // add your custom rules here
     rules: {

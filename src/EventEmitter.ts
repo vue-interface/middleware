@@ -2,35 +2,37 @@ import { qualifyCallbackKey } from "./utils";
 
 export default class EventEmitter {
 
-    set callbacks(callbacks) {
+    protected $callbacks: Map<string,((...args) => void)[]>
+
+    set callbacks(callbacks: Map<string,((...args) => void)[]>) {
         this.$callbacks = callbacks;
     }
 
-    get callbacks() {
+    get callbacks(): Map<string,((...args) => void)[]> {
         if(!this.$callbacks) {
-            this.callbacks = {};
+            this.callbacks = new Map;
         }
 
         return this.$callbacks;
     }
 
-    on(key, fn) {
+    on(key: string, fn: (...args) => void) {
         if(typeof fn !== 'function') {
             throw new Error('Callback must be an instance of a `Function`.');
         }
         
         key = qualifyCallbackKey(key);
 
-        if(this.callbacks[key] === undefined) {
-            this.callbacks[key] = [];
+        if(this.callbacks.has(key)) {
+            this.callbacks.set(key, [])
         }
 
-        this.callbacks[key].push(fn);
+        this.callbacks.get(key).push(fn);
 
         return this;
     }
 
-    once(key, fn) {
+    once(key, fn: (...args) => void) {
         key = qualifyCallbackKey(key);
 
         const wrapper = (...args) => {
@@ -42,23 +44,23 @@ export default class EventEmitter {
         return this.on(key, wrapper);
     }
 
-    off(key, fn) {
+    off(key: string, fn: (...args) => void) {
         key = qualifyCallbackKey(key);
 
-        const index = this.callbacks[key] && this.callbacks[key].indexOf(fn);
+        const index = this.callbacks.has(key) && this.callbacks.get(key).indexOf(fn);
 
         if(index > -1) {
-            this.callbacks[key].splice(index, 1);
+            this.callbacks.get(key).splice(index, 1);
         }
 
         return this;
     }
     
-    emit(key, ...args) {
+    emit(key: string, ...args) {
         key = qualifyCallbackKey(key);
 
-        if(this.callbacks[key]) {
-            [].concat(this.callbacks[key]).forEach(fn => fn(...args));
+        if(this.callbacks.has(key)) {
+            [].concat(this.callbacks.get(key)).forEach(fn => fn(...args));
         }
 
         return this;

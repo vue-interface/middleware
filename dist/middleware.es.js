@@ -1,245 +1,159 @@
-function flatten(array) {
-  var result = [];
-  $flatten(array, result);
-  return result;
-}
-function $flatten(array, result) {
-  for (var i = 0; i < array.length; i++) {
-    var value = array[i];
-    if (Array.isArray(value)) {
-      $flatten(value, result);
-    } else {
-      result.push(value);
-    }
+var p = Object.defineProperty;
+var g = (e, t, r) => t in e ? p(e, t, { enumerable: !0, configurable: !0, writable: !0, value: r }) : e[t] = r;
+var a = (e, t, r) => (g(e, typeof t != "symbol" ? t + "" : t, r), r);
+class u {
+  constructor(t, r, i) {
+    a(this, "validator");
+    a(this, "key");
+    a(this, "args");
+    this.validator = t, this.key = r, this.args = typeof i == "string" ? i.split(",") : [].concat(...i || []);
+  }
+  static make(t, r, i) {
+    return t instanceof this ? t : new this(t, r, i);
+  }
+  async validate(t, r, i) {
+    return await this.validator(t, r, i, ...this.args);
   }
 }
-const MATCH_PATTERN = /^on_?([A-Z]?[a-z]+)?/;
-function qualifyCallbackKey(key) {
-  const matches = key.match(MATCH_PATTERN);
-  return (matches && matches[1] ? matches[1] : key).toLowerCase();
+function w(e) {
+  var t = [];
+  return f(e, t), t;
 }
-function validate(middlewares, to, from, next) {
-  return new Promise(async (resolve, reject) => {
-    let stopped = false;
-    while (!stopped && middlewares.length) {
-      const middleware2 = middlewares.shift();
-      await middleware2.validate(to, from, (...args) => {
-        stopped = true;
-        next(...args);
-        resolve(false);
-      }).catch((e) => {
-        stopped = true;
-        reject(e);
-      });
-    }
-    resolve(true);
-  });
-}
-class EventEmitter {
-  set callbacks(callbacks) {
-    this.$callbacks = callbacks;
-  }
-  get callbacks() {
-    if (!this.$callbacks) {
-      this.callbacks = {};
-    }
-    return this.$callbacks;
-  }
-  on(key, fn) {
-    if (typeof fn !== "function") {
-      throw new Error("Callback must be an instance of a `Function`.");
-    }
-    key = qualifyCallbackKey(key);
-    if (this.callbacks[key] === void 0) {
-      this.callbacks[key] = [];
-    }
-    this.callbacks[key].push(fn);
-    return this;
-  }
-  once(key, fn) {
-    key = qualifyCallbackKey(key);
-    const wrapper = (...args) => {
-      this.off(key, wrapper);
-      fn(...args);
-    };
-    return this.on(key, wrapper);
-  }
-  off(key, fn) {
-    key = qualifyCallbackKey(key);
-    const index = this.callbacks[key] && this.callbacks[key].indexOf(fn);
-    if (index > -1) {
-      this.callbacks[key].splice(index, 1);
-    }
-    return this;
-  }
-  emit(key, ...args) {
-    key = qualifyCallbackKey(key);
-    if (this.callbacks[key]) {
-      [].concat(this.callbacks[key]).forEach((fn) => fn(...args));
-    }
-    return this;
+function f(e, t) {
+  for (var r = 0; r < e.length; r++) {
+    var i = e[r];
+    Array.isArray(i) ? f(i, t) : t.push(i);
   }
 }
-class Middleware {
-  constructor(validator, key, args) {
-    this.validator = validator;
-    this.key = key;
-    this.args = typeof args === "string" ? args.split(",") : [].concat(...args || []);
-  }
-  static make(subject, ...args) {
-    if (subject instanceof this) {
-      return subject;
-    }
-    return new this(subject, ...args);
-  }
-  async validate(to, from, next) {
-    return await this.validator(to, from, next, ...this.args);
-  }
-}
-class MiddlewareRegistry extends EventEmitter {
+class y {
   constructor() {
-    super();
-    this.aliases = /* @__PURE__ */ new Map();
-    this.middlewares = [];
-    this.groups = /* @__PURE__ */ new Map();
-    this.priorities = [];
+    a(this, "aliases");
+    a(this, "groups");
+    a(this, "middlewares", []);
+    a(this, "priorities", []);
+    this.aliases = /* @__PURE__ */ new Map(), this.middlewares = [], this.groups = /* @__PURE__ */ new Map(), this.priorities = [];
   }
-  alias(key, value) {
-    this.aliases.set(key, value);
-    return this;
+  alias(t, r) {
+    return this.aliases.set(t, r), this;
   }
-  group(key, value) {
-    this.groups.set(key, value);
-    return this;
+  group(t, r) {
+    return this.groups.set(t, r), this;
   }
-  middleware(value) {
-    this.middlewares.push(value);
-    return this;
+  middleware(t) {
+    return this.middlewares.push(t), this;
   }
-  priority(...args) {
-    this.priorities = [].concat(...args);
-    return this;
+  priority(...t) {
+    return this.priorities = [].concat(...t), this;
   }
-  prioritize(...args) {
-    return [].concat(...args).sort((a, b) => {
-      let aIndex = this.priorities.indexOf(a.key || a.validator), bIndex = this.priorities.indexOf(b.key || b.validator);
-      if (aIndex > -1 && bIndex > -1) {
-        return aIndex < bIndex ? -1 : 1;
-      }
-      return aIndex > -1 ? -1 : 1;
+  prioritize(...t) {
+    return [].concat(...t).sort((r, i) => {
+      let s = this.priorities.indexOf(r.key || r.validator), n = this.priorities.indexOf(i.key || i.validator);
+      return s > -1 && n > -1 ? s < n ? -1 : 1 : s > -1 ? -1 : 1;
     });
   }
-  resolve(...args) {
-    return flatten([].concat(...args).map((value) => {
-      if (Array.isArray(value)) {
-        return this.resolve(value);
-      }
-      if (typeof value === "function") {
-        return Middleware.make(value);
-      }
-      const [key, args2] = this.definition(value);
-      if (this.aliases.has(key)) {
-        return Middleware.make(this.aliases.get(key), key, ...args2);
-      }
-      if (this.groups.has(key)) {
-        return this.resolve(this.groups.get(key));
-      }
+  resolve(...t) {
+    return w([].concat(...t).map((r) => {
+      if (Array.isArray(r))
+        return this.resolve(r);
+      if (typeof r == "function")
+        return u.make(r);
+      const [i, s] = this.definition(r);
+      if (this.aliases.has(i))
+        return u.make(this.aliases.get(i), i, ...s);
+      if (this.groups.has(i))
+        return this.resolve(this.groups.get(i));
     }));
   }
-  definition(value) {
-    const [key, args] = String(value).split(":");
-    return [key, args ? args.split(".") : []].filter((value2) => !!value2);
+  definition(t) {
+    const [r, i] = String(t).split(":");
+    return [
+      r,
+      i ? i.split(".") : []
+    ].filter((s) => !!s);
   }
-  prioritized(...args) {
-    return this.prioritize(this.resolve([...this.middlewares, ...args]).filter((value) => value instanceof Middleware));
+  prioritized(...t) {
+    return this.prioritize(this.resolve([
+      ...this.middlewares,
+      ...t
+    ]).filter((r) => r instanceof u));
   }
 }
-class MiddlewareRoute extends EventEmitter {
-  constructor(route2, options) {
-    super();
-    this.options = Object.assign({
-      catch: [],
-      middleware: [],
-      registrar: new MiddlewareRegistry(),
-      then: []
-    }, options);
-    if (!(this.registrar instanceof MiddlewareRegistry)) {
-      throw Error("The `registrar` property must be an instance of MiddlewareRegistry");
-    }
-    this.intializeBeforeEnter();
-    this.initializeRoute(route2);
-  }
-  intializeBeforeEnter() {
-    this.beforeEnter = async (to, from, next) => {
-      const promise = validate(this.middlewares, to, from, next).then((response) => {
-        next();
-        if (response && this.options.then.length) {
-          this.options.then.reduce((promise2, fn) => {
-            return promise2.then(() => fn(to, from, next));
-          }, promise);
-        }
+function m(e, t, r) {
+  return new Promise(async (i, s) => {
+    const n = [...e];
+    return function o(h) {
+      const d = n.shift();
+      return d ? d.validate(t, r, (c) => {
+        c instanceof Error ? s(c) : c === !1 ? s(new Error(`Cancelling navigation to ${t.path}!`)) : o(c);
+      }) : i(h);
+    }();
+  });
+}
+class k {
+  constructor(t, r) {
+    a(this, "beforeEnter");
+    a(this, "validators", []);
+    a(this, "callbacks", []);
+    this.registry = t, this.rawRoute = r;
+    for (const [i, s] of Object.entries(r))
+      this[i] = s;
+    this.beforeEnter = async (i, s, n) => {
+      const o = m(this.middlewares, i, s);
+      for (const h of this.callbacks)
+        h(o, { to: i, from: s, next: n });
+      await o.then(n).catch((h) => {
       });
-      if (this.options.catch.length) {
-        this.options.catch.reduce((promise2, fn) => {
-          return promise2.catch((e) => fn(e, to, from, next));
-        }, promise);
-      }
     };
   }
-  initializeRoute(route2) {
-    if (typeof route2 === "string") {
-      route2 = {
-        path: route2
-      };
-    }
-    for (const [key, value] of Object.entries(route2)) {
-      Object.defineProperty(this, key, {
-        value,
-        writable: true
-      });
-    }
-  }
-  catch(fn) {
-    this.options.catch.push(fn);
-    return this;
-  }
-  emit(...args) {
-    if (this.registrar) {
-      this.registrar.emit(...args);
-    }
-    return super.emit(...args);
-  }
-  middleware(value, callback) {
-    this.options.middleware.push(value);
-    return this;
-  }
-  then(fn) {
-    this.options.then.push(fn);
-    return this;
-  }
   get middlewares() {
-    return this.registrar.prioritized(this.options.middleware);
+    return this.registry.prioritized(this.validators);
   }
-  get registrar() {
-    return this.options.registrar || new MiddlewareRegistry();
+  middleware(t) {
+    return this.validators.push(t), this;
+  }
+  catch(t) {
+    return this.callbacks.push((r, { to: i, from: s, next: n }) => {
+      r.catch(t && ((o) => t({ error: o, to: i, from: s, next: n })));
+    }), this;
+  }
+  then(t, r) {
+    return this.callbacks.push((i, { to: s, from: n, next: o }) => {
+      i.then(
+        t && ((h) => t({ status: h, to: s, from: n, next: o })),
+        r && ((h) => r({ error: h, to: s, from: n, next: o }))
+      );
+    }), this;
+  }
+  finally(t) {
+    return this.callbacks.push((r, { to: i, from: s, next: n }) => {
+      r.finally(t && (() => t({ to: i, from: s, next: n })));
+    }), this;
   }
 }
-let registrar = new MiddlewareRegistry();
-function alias(...args) {
-  return registrar.alias(...args);
+let l = new y();
+function b(...e) {
+  return l.alias(...e);
 }
-function group(...args) {
-  return registrar.group(...args);
+function M(...e) {
+  return l.group(...e);
 }
-function middleware(...args) {
-  return registrar.middleware(...args);
+function z(...e) {
+  return l.middleware(...e);
 }
-function priority(...args) {
-  return registrar.priority(...args);
+function A(...e) {
+  return l.priority(...e);
 }
-function route(route2, options) {
-  return new MiddlewareRoute(route2, Object.assign({
-    registrar
-  }, options));
+function E(e) {
+  return new k(l, e);
 }
-export { MiddlewareRegistry, MiddlewareRoute, alias, group, middleware, priority, registrar, route };
+export {
+  u as Middleware,
+  y as MiddlewareRegistry,
+  k as MiddlewareRoute,
+  b as alias,
+  M as group,
+  z as middleware,
+  A as priority,
+  l as registrar,
+  E as route
+};

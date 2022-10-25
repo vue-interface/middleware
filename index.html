@@ -6,65 +6,48 @@
         <title>Middleware</title>
     </head>
     <body>
-        <div id="app" class="container mx-auto mb-6">
-            <router-view/>
-        </div>
+        <div id="app" class="container mx-auto mb-6"></div>
         
-        <script type="module">
-            import './index.css';
-            import Vue from 'vue/dist/vue';
-            import VueRouter from 'vue-router';
-
-            import { route, alias, group, middleware, priority } from './index.js';
-            
-            Vue.config.devtools = false;
-            Vue.config.productionTip = false;
-
-            Vue.use(VueRouter);
+        <script type="module" lang="ts">
+            import { createApp } from 'vue';
+            import { createRouter, createWebHashHistory, RouterView } from 'vue-router';
+            import { route, alias, group, middleware, priority } from './index';
 
             alias('is', (to, from, next, name) => {
-                if(to.name !== name) {
-                    next();
-                }
+                next(to.name === name);
             });
 
             alias('id', (to, from, next, id, name) => {
                 if(parseInt(to.query.id) === parseInt(id)) {
-                    return;
+                   next(); 
                 }
-                
-                if(to.query.id === 3) {
-                    throw Error(`Redirecting to "${name}"!`);
+                else {
+                    next({ name })
                 }
-
-                next({name});
             });
-
+            
             group('restricted', [
                 'is:restricted',
                 'id:1,unrestricted'
             ]);
-
-            const router = new VueRouter({
+            
+            const router = createRouter({
+                history: createWebHashHistory(),
                 routes: [
                     route({
                         path: '/',
                         name: 'home',
                         component: () => import('./demo/Home.vue')
-                    }).then(() => {
-                        console.log('home!')
                     }),
-                    
+
                     route({
                         path: '/restricted', 
                         name: 'restricted', 
                         component: () => import('./demo/Restricted.vue')
-                    }).middleware('restricted').then((to, from, next) => {
-                        console.log('Route resolved!', to, from, next)
-                    }).catch((e, to, from, next) => {
-                        console.log('catch the error', e);
+                    }).middleware('restricted').catch(({ error, next }) => {
+                        console.log(error);
 
-                        next({name: 'unrestricted'});
+                        next({name: 'unrestricted'})
                     }),
 
                     route({
@@ -74,11 +57,10 @@
                     }).middleware('is:unrestricted')
                 ]
             });
-            
-            const vue = new Vue({
-                el: '#app',
-                router
-            });
+
+            const app = createApp(RouterView)
+                .use(router)
+                .mount('#app');
         </script>
     </body>
 </html>

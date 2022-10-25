@@ -1,25 +1,30 @@
 import { flatten } from "array-flatten";
-import EventEmitter from "./EventEmitter";
 import Middleware from "./Middleware";
 
-export default class MiddlewareRegistry extends EventEmitter {
+export default class MiddlewareRegistry {
+
+    protected aliases: Map<string,any>;
+
+    protected groups: Map<string,any>;
+
+    protected middlewares = [];
+
+    protected priorities = [];
 
     constructor() {
-        super();
-        
         this.aliases = new Map;
         this.middlewares = [];
         this.groups = new Map;
         this.priorities = [];
     }
 
-    alias(key, value) {
+    alias(key: string, value) {
         this.aliases.set(key, value);
 
         return this;
     }
 
-    group(key, value) {
+    group(key: string, value) {
         this.groups.set(key, value);
 
         return this;

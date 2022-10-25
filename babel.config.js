@@ -1,5 +1,5 @@
 module.exports = {
     presets: [
-        'vue'
+        'vue', '@babel/preset-typescript'
     ]
 };

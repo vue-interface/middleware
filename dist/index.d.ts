@@ -1,0 +1,10 @@
+import Middleware from "./src/Middleware";
+import MiddlewareRegistry from "./src/MiddlewareRegistry";
+import MiddlewareRoute from './src/MiddlewareRoute';
+export { Middleware, MiddlewareRegistry, MiddlewareRoute };
+export declare let registrar: MiddlewareRegistry;
+export declare function alias(...args: any[]): MiddlewareRegistry;
+export declare function group(...args: any[]): MiddlewareRegistry;
+export declare function middleware(...args: any[]): MiddlewareRegistry;
+export declare function priority(...args: any[]): MiddlewareRegistry;
+export declare function route(route: any): MiddlewareRoute;
