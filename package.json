@@ -26,11 +26,11 @@
   },
   "dependencies": {
     "array-flatten": "^3.0.0",
-    "camel-case": "^4.1.2",
-    "vue-router": "^4.0"
+    "camel-case": "^4.1.2"
   },
   "peerDependencies": {
-    "vue": "^3.0"
+    "vue": "^3.0",
+    "vue-router": "^4.0"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.19.1",
