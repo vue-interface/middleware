@@ -1,4 +1,4 @@
-import { RouteRecord } from 'vue-router';
+import type { RouteLocationNormalized } from 'vue-router';
 import { camelCase } from 'camel-case';
 import type { ValidatorResponse } from './types';
 import Middleware from './Middleware';
@@ -31,7 +31,7 @@ export function prioritize(priority, ...args) {
     }); 
 }
 
-export function validate(middlewares: Middleware[], to: RouteRecord, from: RouteRecord): Promise<ValidatorResponse> {
+export function validate(middlewares: Middleware[], to: RouteLocationNormalized, from: RouteLocationNormalized): Promise<ValidatorResponse> {
     return new Promise(async(resolve, reject) => {
         const subjects = [...middlewares];
     
@@ -49,8 +49,11 @@ export function validate(middlewares: Middleware[], to: RouteRecord, from: Route
                 else if(status === false) {
                     reject(new Error(`Cancelling navigation to ${to.path}!`));
                 }
-                else {
+                else if([true, undefined].includes(<any> status)) {
                     run(status);
+                }
+                else {
+                    resolve(status);
                 }
             });
         }();

@@ -21,11 +21,11 @@ export default class MiddlewareRoute {
      * Create the new middleware route instance.
      */
     constructor(registry: MiddlewareRegistry, rawRoute: RouteRecordRaw);
-    get middlewares(): any[];
+    get middlewares(): import("./Middleware").default[];
     /**
      * Add a middleware to the route.
      */
-    middleware(validator: Validator): this;
+    middleware(validator: string | Validator): this;
     /**
      * Add a then handler to promise resolver.
      */

@@ -1,5 +1,6 @@
 import { flatten } from "array-flatten";
 import Middleware from "./Middleware";
+import { Group, Validator } from "./types";
 
 export default class MiddlewareRegistry {
 
@@ -18,31 +19,31 @@ export default class MiddlewareRegistry {
         this.priorities = [];
     }
 
-    alias(key: string, value) {
+    alias(key: string, value: Validator) {
         this.aliases.set(key, value);
 
         return this;
     }
 
-    group(key: string, value) {
+    group(key: string, value: Group) {
         this.groups.set(key, value);
 
         return this;
     }
 
-    middleware(value) {
+    middleware(value: Middleware): this {
         this.middlewares.push(value);
 
         return this;
     }
 
-    priority(...args) {
+    priority(...args): this {
         this.priorities = [].concat(...args);
 
         return this;
     }
     
-    prioritize(...args) {
+    prioritize(...args): Middleware[] {
         return [].concat(...args).sort((a, b) => {
             let aIndex = this.priorities.indexOf(a.key || a.validator),
                 bIndex = this.priorities.indexOf(b.key || b.validator);
@@ -55,7 +56,7 @@ export default class MiddlewareRegistry {
         }); 
     }
 
-    resolve(...args) {
+    resolve(...args): Middleware[] {
         return flatten([].concat(...args).map(value => {
             if(Array.isArray(value)) {
                 return this.resolve(value);
@@ -68,7 +69,7 @@ export default class MiddlewareRegistry {
             const [ key, args ] = this.definition(value);
         
             if(this.aliases.has(key)) {
-                return Middleware.make(this.aliases.get(key), key, ...args);
+                return Middleware.make(this.aliases.get(key), key, args);
             }
         
             if(this.groups.has(key)) {
@@ -77,15 +78,15 @@ export default class MiddlewareRegistry {
         }));
     }
 
-    definition(value) {
+    definition(value): [string, string[]] {
         const [ key, args ] = String(value).split(':');
 
         return [
             key, args ? args.split('.') : []
-        ].filter(value => !!value);
+        ];
     }
 
-    prioritized(...args) {
+    prioritized(...args): Middleware[] {
         return this.prioritize(this.resolve([
             ...this.middlewares,
             ...args,

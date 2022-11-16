@@ -1,10 +1,12 @@
+import type { RouteRecordRaw } from 'vue-router';
 import Middleware from "./src/Middleware";
 import MiddlewareRegistry from "./src/MiddlewareRegistry";
 import MiddlewareRoute from './src/MiddlewareRoute';
+import { Group, Validator } from "./src/types";
 export { Middleware, MiddlewareRegistry, MiddlewareRoute };
 export declare let registrar: MiddlewareRegistry;
-export declare function alias(...args: any[]): MiddlewareRegistry;
-export declare function group(...args: any[]): MiddlewareRegistry;
-export declare function middleware(...args: any[]): MiddlewareRegistry;
+export declare function alias(key: string, value: Validator): MiddlewareRegistry;
+export declare function group(key: string, value: Group): MiddlewareRegistry;
+export declare function middleware(value: Middleware): MiddlewareRegistry;
 export declare function priority(...args: any[]): MiddlewareRegistry;
-export declare function route(route: any): MiddlewareRoute;
+export declare function route(route: RouteRecordRaw): MiddlewareRoute;

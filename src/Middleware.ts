@@ -1,4 +1,4 @@
-import type { NavigationGuardNext, RouteRecord } from "vue-router";
+import type { NavigationGuardNext, RouteLocationNormalized } from "vue-router";
 import type { Validator } from "./types";
 
 export default class Middleware {
@@ -24,7 +24,7 @@ export default class Middleware {
         return new this(validator, key, args);
     }
 
-    async validate(to: RouteRecord, from: RouteRecord, next: NavigationGuardNext) {
+    async validate(to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) {
         return await this.validator(to, from, next, ...this.args);
     }
 }

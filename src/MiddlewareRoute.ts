@@ -53,7 +53,7 @@ export default class MiddlewareRoute {
     /**
      * Add a middleware to the route.
      */
-    middleware(validator: Validator): this {
+    middleware(validator: string|Validator): this {
         this.validators.push(validator);
 
         return this;

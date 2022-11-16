@@ -1,6 +1,8 @@
+import type { RouteRecordRaw } from 'vue-router';
 import Middleware from "./src/Middleware";
 import MiddlewareRegistry from "./src/MiddlewareRegistry";
 import MiddlewareRoute from './src/MiddlewareRoute';
+import { Group, Validator } from "./src/types";
 
 export {
     Middleware,
@@ -10,22 +12,22 @@ export {
 
 export let registrar = new MiddlewareRegistry;
 
-export function alias(...args) {
-    return registrar.alias(...args);        
+export function alias(key: string, value: Validator): MiddlewareRegistry {
+    return registrar.alias(key, value);        
 }
 
-export function group(...args) {
-    return registrar.group(...args);          
+export function group(key: string, value: Group): MiddlewareRegistry {
+    return registrar.group(key, value);          
 }
 
-export function middleware(...args) {
-    return registrar.middleware(...args);          
+export function middleware(value: Middleware): MiddlewareRegistry {
+    return registrar.middleware(value);          
 }
 
-export function priority(...args) {
+export function priority(...args): MiddlewareRegistry {
     return registrar.priority(...args);  
 }
 
-export function route(route) {
+export function route(route: RouteRecordRaw): MiddlewareRoute {
     return new MiddlewareRoute(registrar, route);
 }
