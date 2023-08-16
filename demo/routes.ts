@@ -8,8 +8,8 @@ import HomeVue from './Home.vue';
 import LoginVue from './Login.vue';
 
 priority([
+    '2',
     '1',
-    '2'
 ]);
 
 alias('1', (_to, _from, next) => {

@@ -1,11 +1,11 @@
 import type { RouteRecordRaw } from '../../../../../../node_modules/vue-router/dist/vue-router.cjs';
 import Middleware from './src/Middleware';
 import MiddlewareRegistry, { Group } from './src/MiddlewareRegistry';
-import { MiddlewareRouteMultipleViews, MiddlewareRouteRecord, MiddlewareRouteSingleView, Validator, ValidatorCallback } from './src/MiddlewareRoute';
+import { MiddlewareRouteMultipleViews, MiddlewareRouteMultipleViewsWithChildren, MiddlewareRouteRedirect, MiddlewareRouteSingleView, MiddlewareRouteSingleViewWithChildren, Validator, ValidatorCallback } from './src/MiddlewareRoute';
 export { Middleware, MiddlewareRegistry };
 export declare const registrar: MiddlewareRegistry;
 export declare function alias(key: string, value: ValidatorCallback): MiddlewareRegistry;
 export declare function group(key: string, value: Group): MiddlewareRegistry;
 export declare function middleware(value: Middleware): MiddlewareRegistry;
 export declare function priority(priority: Validator[]): MiddlewareRegistry;
-export declare function route(route: RouteRecordRaw): MiddlewareRouteSingleView | MiddlewareRouteMultipleViews | MiddlewareRouteRecord;
+export declare function route(route: RouteRecordRaw): MiddlewareRouteMultipleViewsWithChildren | MiddlewareRouteSingleViewWithChildren | MiddlewareRouteMultipleViews | MiddlewareRouteSingleView | MiddlewareRouteRedirect;

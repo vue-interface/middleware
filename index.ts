@@ -1,7 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router';
 import Middleware from './src/Middleware';
 import MiddlewareRegistry, { Group } from './src/MiddlewareRegistry';
-import { MiddlewareRouteMultipleViews, MiddlewareRouteRecord, MiddlewareRouteSingleView, Validator, ValidatorCallback } from './src/MiddlewareRoute';
+import { MiddlewareRouteMultipleViews, MiddlewareRouteMultipleViewsWithChildren, MiddlewareRouteRedirect, MiddlewareRouteSingleView, MiddlewareRouteSingleViewWithChildren, Validator, ValidatorCallback } from './src/MiddlewareRoute';
 
 export {
     Middleware,
@@ -27,13 +27,25 @@ export function priority(priority: Validator[]): MiddlewareRegistry {
 }
 
 export function route(route: RouteRecordRaw) {
-    if(route.component) {
-        return new MiddlewareRouteSingleView(registrar, route);
+    if(route.children && route.components) {
+        return new MiddlewareRouteMultipleViewsWithChildren(registrar, route);
     }
-    
-    if(route.components) {
+
+    if(route.children && route.component) {
+        return new MiddlewareRouteSingleViewWithChildren(registrar, route);
+    }
+
+    if(!route.children && route.components) {
         return new MiddlewareRouteMultipleViews(registrar, route);
     }
 
-    return new MiddlewareRouteRecord(registrar, route);
+    if(!route.children && route.component) {
+        return new MiddlewareRouteSingleView(registrar, route);
+    }
+
+    if(!route.children && route.redirect) {
+        return new MiddlewareRouteRedirect(registrar, route);
+    }
+
+    throw new Error('Invalid route!');
 }

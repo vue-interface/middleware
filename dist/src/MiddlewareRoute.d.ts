@@ -1,5 +1,5 @@
 import { Component, ComponentPublicInstance } from 'vue';
-import type { NavigationGuardNext, RouteLocation, RouteLocationNormalized, RouteLocationRaw, RouteRecordRaw, _RouteRecordBase } from '../../../../../../../node_modules/vue-router/dist/vue-router.cjs';
+import type { NavigationGuardNext, RouteLocationNormalized, RouteLocationRaw, RouteRecordRaw, RouteRecordRedirectOption, _RouteRecordBase } from '../../../../../../../node_modules/vue-router/dist/vue-router.cjs';
 import MiddlewareRegistry from './MiddlewareRegistry';
 export type RouteRecordName = string | symbol;
 export type ValidatorCallback = (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext, ...args: (string | undefined)[]) => void;
@@ -31,10 +31,6 @@ declare abstract class MiddlewareRoute {
      * @example `/users/:id` matches `/users/1` as well as `/users/posva`.
      */
     path: string;
-    /**
-     * Array of nested routes.
-     */
-    children?: RouteRecordRaw['children'];
     /**
      * Aliases for the record. Allows defining extra paths that will behave like a
      * copy of the record. Allows having paths shorthands like `/users/:id` and
@@ -93,6 +89,8 @@ export interface RouteRecordSingleView extends _RouteRecordBase {
      */
     component: RawRouteComponent;
     components?: never;
+    children?: never;
+    redirect?: never;
     /**
      * Allow passing down params as props to the component rendered by `router-view`.
      */
@@ -113,6 +111,39 @@ export declare class MiddlewareRouteSingleView extends MiddlewareRoute implement
     constructor(registry: MiddlewareRegistry, rawRoute: RouteRecordSingleView);
 }
 /**
+ * Route Record defining one single component with a nested view.
+ */
+export interface RouteRecordSingleViewWithChildren extends _RouteRecordBase {
+    /**
+     * Component to display when the URL matches this route.
+     */
+    component?: RawRouteComponent | null | undefined;
+    components?: never;
+    children: RouteRecordRaw[];
+    /**
+     * Allow passing down params as props to the component rendered by `router-view`.
+     */
+    props?: RouteRecordProps;
+}
+export declare class MiddlewareRouteSingleViewWithChildren extends MiddlewareRoute implements RouteRecordSingleViewWithChildren {
+    /**
+     * Component to display when the URL matches this route.
+     */
+    component?: RawRouteComponent | null | undefined;
+    /**
+     * Nested route records.
+     */
+    children: RouteRecordRaw[];
+    /**
+     * Allow passing down params as props to the component rendered by `router-view`.
+     */
+    props?: RouteRecordProps;
+    /**
+     * Create the new middleware route instance.
+     */
+    constructor(registry: MiddlewareRegistry, rawRoute: RouteRecordSingleViewWithChildren);
+}
+/**
  * Route Record defining multiple named components with the `components` option.
  */
 export interface RouteRecordMultipleViews extends _RouteRecordBase {
@@ -121,6 +152,7 @@ export interface RouteRecordMultipleViews extends _RouteRecordBase {
      */
     components: Record<string, RawRouteComponent>;
     component?: never;
+    redirect?: never;
     /**
      * Allow passing down params as props to the component rendered by
      * `router-view`. Should be an object with the same keys as `components` or a
@@ -148,21 +180,56 @@ export declare class MiddlewareRouteMultipleViews extends MiddlewareRoute implem
     constructor(registry: MiddlewareRegistry, rawRoute: RouteRecordMultipleViews);
 }
 /**
+ * Route Record defining multiple named components with the `components` option and children.
+ */
+export interface RouteRecordMultipleViewsWithChildren extends _RouteRecordBase {
+    /**
+     * Components to display when the URL matches this route. Allow using named views.
+     */
+    components?: Record<string, RawRouteComponent> | null | undefined;
+    component?: never;
+    children: RouteRecordRaw[];
+    /**
+     * Allow passing down params as props to the component rendered by
+     * `router-view`. Should be an object with the same keys as `components` or a
+     * boolean to be applied to every component.
+     */
+    props?: Record<string, RouteRecordProps> | boolean;
+}
+export declare class MiddlewareRouteMultipleViewsWithChildren extends MiddlewareRoute implements RouteRecordMultipleViewsWithChildren {
+    readonly registry: MiddlewareRegistry;
+    readonly rawRoute: RouteRecordMultipleViewsWithChildren;
+    /**
+     * Components to display when the URL matches this route. Allow using named views.
+     */
+    components?: Record<string, RawRouteComponent> | null | undefined;
+    component?: never;
+    children: RouteRecordRaw[];
+    /**
+     * Allow passing down params as props to the component rendered by
+     * `router-view`. Should be an object with the same keys as `components` or a
+     * boolean to be applied to every component.
+     */
+    props?: Record<string, RouteRecordProps> | boolean;
+    /**
+     * Create the new middleware route instance.
+     */
+    constructor(registry: MiddlewareRegistry, rawRoute: RouteRecordMultipleViewsWithChildren);
+}
+/**
  * Route Record that defines a redirect. Cannot have `component` or `components`
  * as it is never rendered.
  */
-declare interface RouteRecordRedirect extends _RouteRecordBase {
+export interface RouteRecordRedirect extends _RouteRecordBase {
     redirect: RouteRecordRedirectOption;
     component?: never;
     components?: never;
+    props?: never;
 }
-declare type RouteRecordRedirectOption = RouteLocationRaw | ((to: RouteLocation) => RouteLocationRaw);
-export declare class MiddlewareRouteRecord extends MiddlewareRoute implements RouteRecordRedirect {
+export declare class MiddlewareRouteRedirect extends MiddlewareRoute implements RouteRecordRedirect {
     readonly registry: MiddlewareRegistry;
     readonly rawRoute: RouteRecordRedirect;
     redirect: RouteRecordRedirectOption;
-    component?: never;
-    components?: never;
     /**
      * Create the new middleware route instance.
      */
