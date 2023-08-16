@@ -1,12 +1,24 @@
 {
-    "compilerOptions": {
-      "lib": ["ES6", "ES2015", "ES2017", "ES2019", "DOM"],
-      "target": "ES2016",
-      "module": "ES6",
-      "moduleResolution": "Node",
-      // "isolatedModules": true,
-      "esModuleInterop": true,
+  "compilerOptions": {
+      "target": "ESNext",
+      "module": "ESNext",
+      "moduleResolution": "node",
+      "importHelpers": true,
       "jsx": "preserve",
-      "types": ["vite/client"]
-    }
+      "esModuleInterop": true,
+      "resolveJsonModule": true,
+      "sourceMap": true,
+      "baseUrl": "./",
+      "strict": true,
+      "paths": {},
+      "allowSyntheticDefaultImports": true,
+      "skipLibCheck": true,
+      "noImplicitThis": false,
+      "types": [
+          "vite/client",
+          "vue",
+          "vue/macros-global",
+          "vue/ref-macros"
+      ]
   }
+}

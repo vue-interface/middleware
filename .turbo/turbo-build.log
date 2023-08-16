@@ -1,0 +1,16 @@
+
+> @vue-interface/middleware@1.0.0-beta.4 build /Users/justinkimbrell/Code/vue-interface/packages/middleware
+> vite build
+
+vite v4.2.0 building for production...
+transforming...
+✓ 5 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/middleware.js  6.71 kB │ gzip: 2.08 kB │ map: 21.12 kB
+dist/middleware.umd.cjs  3.90 kB │ gzip: 1.46 kB │ map: 20.33 kB
+
+[vite:dts] Start generate declaration files...
+✓ built in 169ms
+[vite:dts] Declaration files built in 619ms.
+

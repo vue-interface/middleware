@@ -9,58 +9,7 @@
         <div id="app" class="container mx-auto mb-6"></div>
         
         <script type="module" lang="ts">
-            import { createApp } from 'vue';
-            import { createRouter, createWebHashHistory, RouterView } from 'vue-router';
-            import { route, alias, group, middleware, priority } from './index';
-
-            alias('is', (to, from, next, name) => {
-                next(to.name === name);
-            });
-
-            alias('id', (to, from, next, id, name) => {
-                if(parseInt(to.query.id) === parseInt(id)) {
-                   next(); 
-                }
-                else {
-                    next({ name })
-                }
-            });
-            
-            group('restricted', [
-                'is:restricted',
-                'id:1,unrestricted'
-            ]);
-            
-            const router = createRouter({
-                history: createWebHashHistory(),
-                routes: [
-                    route({
-                        path: '/',
-                        name: 'home',
-                        component: () => import('./demo/Home.vue')
-                    }),
-
-                    route({
-                        path: '/restricted', 
-                        name: 'restricted', 
-                        component: () => import('./demo/Restricted.vue')
-                    }).middleware('restricted').catch(({ error, next }) => {
-                        console.log(error);
-
-                        next({name: 'unrestricted'})
-                    }),
-
-                    route({
-                        path: '/unrestricted',
-                        name: 'unrestricted',
-                        component: () => import('./demo/Unrestricted.vue')
-                    }).middleware('is:unrestricted')
-                ]
-            });
-
-            const app = createApp(RouterView)
-                .use(router)
-                .mount('#app');
+            import './demo'
         </script>
     </body>
 </html>

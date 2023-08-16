@@ -1,5 +1,5 @@
 import type { ComponentPublicInstance } from 'vue';
-import type { NavigationGuardNext, RouteLocationRaw } from 'vue-router';
+import type { NavigationGuardNext, RouteLocationRaw } from '../../../../../../../node_modules/vue-router/dist/vue-router.cjs';
 
 export declare type Alias = string;
 export declare type Aliases = Alias[];

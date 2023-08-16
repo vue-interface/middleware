@@ -1,16 +1,18 @@
-import { flatten } from "array-flatten";
-import Middleware from "./Middleware";
-import { Group, Validator } from "./types";
+import Middleware from './Middleware';
+import { Validator, ValidatorCallback } from './MiddlewareRoute';
+
+export declare type Alias = string;
+export declare type Group = (string|Validator)[];
 
 export default class MiddlewareRegistry {
 
-    protected aliases: Map<string,any>;
+    protected aliases: Map<string,ValidatorCallback>;
 
     protected groups: Map<string,any>;
 
-    protected middlewares = [];
+    protected middlewares: Middleware[] = [];
 
-    protected priorities = [];
+    protected priorities: Validator[] = [];
 
     constructor() {
         this.aliases = new Map;
@@ -19,7 +21,7 @@ export default class MiddlewareRegistry {
         this.priorities = [];
     }
 
-    alias(key: string, value: Validator) {
+    alias(key: string, value: ValidatorCallback) {
         this.aliases.set(key, value);
 
         return this;
@@ -37,15 +39,15 @@ export default class MiddlewareRegistry {
         return this;
     }
 
-    priority(...args): this {
-        this.priorities = [].concat(...args);
+    priority(priority: Validator[]): this {
+        this.priorities = priority;
 
         return this;
     }
     
-    prioritize(...args): Middleware[] {
-        return [].concat(...args).sort((a, b) => {
-            let aIndex = this.priorities.indexOf(a.key || a.validator),
+    prioritize(subject: Middleware[]): Middleware[] {
+        return subject.sort((a, b) => {
+            const aIndex = this.priorities.indexOf(a.key || a.validator),
                 bIndex = this.priorities.indexOf(b.key || b.validator);
 
             if(aIndex > -1 && bIndex > -1) {
@@ -56,41 +58,43 @@ export default class MiddlewareRegistry {
         }); 
     }
 
-    resolve(...args): Middleware[] {
-        return flatten([].concat(...args).map(value => {
-            if(Array.isArray(value)) {
-                return this.resolve(value);
+    resolve(subjects: (Middleware|Validator)[]): Middleware[] {
+        return subjects.map(value => {
+            if(value instanceof Middleware) {
+                return value;
+            }
+            
+            if(typeof value === 'function') {
+                return new Middleware(value);
             }
 
-            if(typeof value === 'function') {
-                return Middleware.make(value);
-            }
-        
             const [ key, args ] = this.definition(value);
         
-            if(this.aliases.has(key)) {
-                return Middleware.make(this.aliases.get(key), key, args);
+            const alias = this.aliases.get(key);
+
+            if(alias) {
+                return new Middleware(alias, key, args);
             }
-        
-            if(this.groups.has(key)) {
-                return this.resolve(this.groups.get(key));
-            }
-        }));
+            
+            return this.resolve(this.groups.get(key));
+        }).flat(1);
     }
 
-    definition(value): [string, string[]] {
-        const [ key, args ] = String(value).split(':');
+    definition(value: string): [string, string[]] {
+        const [ key, args ] = value.split(':');
 
         return [
             key, args ? args.split('.') : []
         ];
     }
 
-    prioritized(...args): Middleware[] {
-        return this.prioritize(this.resolve([
+    prioritized(validators: Validator[]): Middleware[] {
+        const resolved = this.resolve([
             ...this.middlewares,
-            ...args,
-        ]).filter(value => value instanceof Middleware));
+            ...validators
+        ]).filter(value => value instanceof Middleware);
+
+        return this.prioritize(resolved);
     }
 
 }

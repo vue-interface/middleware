@@ -1,17 +1,19 @@
-import Middleware from "./Middleware";
-import { Group, Validator } from "./types";
+import Middleware from './Middleware';
+import { Validator, ValidatorCallback } from './MiddlewareRoute';
+export declare type Alias = string;
+export declare type Group = (string | Validator)[];
 export default class MiddlewareRegistry {
-    protected aliases: Map<string, any>;
+    protected aliases: Map<string, ValidatorCallback>;
     protected groups: Map<string, any>;
-    protected middlewares: any[];
-    protected priorities: any[];
+    protected middlewares: Middleware[];
+    protected priorities: Validator[];
     constructor();
-    alias(key: string, value: Validator): this;
+    alias(key: string, value: ValidatorCallback): this;
     group(key: string, value: Group): this;
     middleware(value: Middleware): this;
-    priority(...args: any[]): this;
-    prioritize(...args: any[]): Middleware[];
-    resolve(...args: any[]): Middleware[];
-    definition(value: any): [string, string[]];
-    prioritized(...args: any[]): Middleware[];
+    priority(priority: Validator[]): this;
+    prioritize(subject: Middleware[]): Middleware[];
+    resolve(subjects: (Middleware | Validator)[]): Middleware[];
+    definition(value: string): [string, string[]];
+    prioritized(validators: Validator[]): Middleware[];
 }
