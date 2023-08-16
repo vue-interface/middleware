@@ -1,13 +1,8 @@
-import { camelCase } from 'camel-case';
 import type { RouteLocationNormalized } from 'vue-router';
 import Middleware from './Middleware';
 import { ValidatorResponse } from './MiddlewareRoute';
 
 const MATCH_PATTERN = /^on_?([A-Z]?[a-z]+)?/;
-
-export function qualifyCallbackFunction(key: string) {
-    return camelCase(key.match(MATCH_PATTERN) ? key : `on_${key}`);
-}
 
 export function qualifyCallbackKey(key: string) {
     const matches = key.match(MATCH_PATTERN);
