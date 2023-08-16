@@ -100,7 +100,7 @@ abstract class MiddlewareRoute  {
                 method(promise, { to, from, next });
             }
 
-            await promise.then(next).catch(e => {
+            await promise.then(next).catch(() => {
                 // Ignore the error by default.
             });
         };
