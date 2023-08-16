@@ -1,7 +1,7 @@
-module.exports = {
+export default {
     content: [
-        "./index.html",
-        "./demo/**.vue"
+        './index.html',
+        './demo/**.vue'
     ],
     theme: {
         extend: {},
